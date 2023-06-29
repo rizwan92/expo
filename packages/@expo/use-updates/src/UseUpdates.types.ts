@@ -80,7 +80,12 @@ export type AvailableUpdateInfo = {
   /**
    * The [manifest](https://docs.expo.dev/versions/latest/sdk/constants/#manifest) for the update.
    */
-  manifest: Manifest;
+  manifest: Manifest | null;
+  /**
+   * True if this update is a directive to invalidate all downloaded updates and roll back to running the embedded app bundle.
+   * False otherwise.
+   */
+  isRollback: boolean;
 };
 
 /**
@@ -106,6 +111,14 @@ export type UseUpdatesReturnType = {
    */
   isUpdatePending: boolean;
   /**
+   * True if the app is currently checking for a new available update from the server.
+   */
+  isChecking: boolean;
+  /**
+   * True if the app is currently downloading an update from the server.
+   */
+  isDownloading: boolean;
+  /**
    * If an error is returned by any of the APIs to check for, download, or launch updates,
    * the error description will appear here.
    */
@@ -129,6 +142,8 @@ export type UseUpdatesStateType = {
   error?: Error;
   isUpdateAvailable: boolean;
   isUpdatePending: boolean;
+  isChecking: boolean;
+  isDownloading: boolean;
   lastCheckForUpdateTimeSinceRestart?: Date;
   logEntries?: UpdatesLogEntry[];
 };
@@ -138,30 +153,9 @@ export type UseUpdatesStateType = {
  */
 export enum UseUpdatesEventType {
   /**
-   * A new update is available for the app. This event can be fired either from
-   * the native code that automatically checks for an update on startup (when automatic updates
-   * are enabled), or from the completion of checkForUpdate().
-   */
-  UPDATE_AVAILABLE = 'updateAvailable',
-  /**
-   * No new update is available for the app, and the most up-to-date update is already running.
-   * This event can be fired either from
-   * the native code that automatically checks for an update on startup (when automatic updates
-   * are enabled), or from the completion of checkForUpdate().
-   */
-  NO_UPDATE_AVAILABLE = 'noUpdateAvailable',
-  /**
    * An error occurred.
    */
   ERROR = 'error',
-  /**
-   * A call to `downloadUpdate()` has started.
-   */
-  DOWNLOAD_START = 'downloadStart',
-  /**
-   * A call to `downloadUpdate()` has completed successfully.
-   */
-  DOWNLOAD_COMPLETE = 'downloadComplete',
   /**
    * A call to `readLogEntries()` has completed successfully.
    */
@@ -176,11 +170,6 @@ export type UseUpdatesEvent = {
    * Type of the event.
    */
   type: UseUpdatesEventType;
-  /**
-   * If `type` is `UseUpdatesEvent.UPDATE_AVAILABLE` or `UseUpdatesEvent.DOWNLOAD_COMPLETE`,
-   * the manifest of the new update, and `undefined` otherwise.
-   */
-  manifest?: Manifest;
   /**
    * If `type` is `UseUpdatesEventType.ERROR`, the error, and `undefined` otherwise.
    */

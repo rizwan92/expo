@@ -1,12 +1,6 @@
 import * as Updates from 'expo-updates';
 
-import type {
-  AvailableUpdateInfo,
-  CurrentlyRunningInfo,
-  Manifest,
-  UseUpdatesEvent,
-} from './UseUpdates.types';
-import { UseUpdatesEventType } from './UseUpdates.types';
+import type { CurrentlyRunningInfo } from './UseUpdates.types';
 
 // The currently running info, constructed from Updates constants
 export const currentlyRunning: CurrentlyRunningInfo = {
@@ -22,8 +16,10 @@ export const currentlyRunning: CurrentlyRunningInfo = {
 /////// Internal functions ////////
 
 // Constructs the availableUpdate from the update manifest
-export const availableUpdateFromManifest = (manifest?: Manifest) => {
-  return manifest
+export const availableUpdateFromContext = (context: { [key: string]: any }) => {
+  const manifest = context?.latestManifest;
+  const isRollback = context.isRollback;
+  return manifest || isRollback
     ? {
         updateId: manifest?.id ?? null,
         createdAt:
@@ -32,29 +28,8 @@ export const availableUpdateFromManifest = (manifest?: Manifest) => {
             : manifest && 'publishedTime' in manifest && manifest.publishedTime
             ? new Date(manifest.publishedTime)
             : null,
-        manifest,
+        manifest: manifest || null,
+        isRollback,
       }
     : undefined;
-};
-
-// Constructs the available update from an event
-export const availableUpdateFromEvent: (event: UseUpdatesEvent) => {
-  availableUpdate?: AvailableUpdateInfo;
-  error?: Error;
-} = (event) => {
-  switch (event.type) {
-    case UseUpdatesEventType.NO_UPDATE_AVAILABLE:
-      return {};
-    case UseUpdatesEventType.UPDATE_AVAILABLE:
-    case UseUpdatesEventType.DOWNLOAD_COMPLETE:
-      return {
-        availableUpdate: availableUpdateFromManifest(event?.manifest || undefined),
-      };
-    case UseUpdatesEventType.ERROR:
-      return {
-        error: event.error,
-      };
-    default:
-      return {};
-  }
 };

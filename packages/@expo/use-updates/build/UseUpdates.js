@@ -2,33 +2,14 @@ import * as Updates from 'expo-updates';
 import { useEffect, useState } from 'react';
 import { UseUpdatesEventType } from './UseUpdates.types';
 import { emitEvent, useUpdateEvents, addUpdatesStateChangeListener } from './UseUpdatesEmitter';
-import { currentlyRunning, availableUpdateFromEvent } from './UseUpdatesUtils';
+import { currentlyRunning, availableUpdateFromContext } from './UseUpdatesUtils';
 /**
  * Calls [`Updates.checkForUpdateAsync()`](https://docs.expo.dev/versions/latest/sdk/updates/#updatescheckforupdateasync)
  * and refreshes the `availableUpdate` property with the result.
  * If an error occurs, the `error` property will be set.
  */
 export const checkForUpdate = () => {
-    Updates.checkForUpdateAsync()
-        .then((result) => {
-        if (result.isAvailable) {
-            emitEvent({
-                type: UseUpdatesEventType.UPDATE_AVAILABLE,
-                manifest: result?.manifest || undefined,
-            });
-        }
-        else {
-            emitEvent({
-                type: UseUpdatesEventType.NO_UPDATE_AVAILABLE,
-            });
-        }
-    })
-        .catch((error) => {
-        emitEvent({
-            type: UseUpdatesEventType.ERROR,
-            error,
-        });
-    });
+    Updates.checkForUpdateAsync();
 };
 /**
  * Downloads an update, if one is available, using
@@ -37,21 +18,7 @@ export const checkForUpdate = () => {
  * If an error occurs, the `error` property will be set.
  */
 export const downloadUpdate = () => {
-    emitEvent({
-        type: UseUpdatesEventType.DOWNLOAD_START,
-    });
-    Updates.fetchUpdateAsync()
-        .then((result) => {
-        emitEvent({
-            type: UseUpdatesEventType.DOWNLOAD_COMPLETE,
-        });
-    })
-        .catch((error) => {
-        emitEvent({
-            type: UseUpdatesEventType.ERROR,
-            error,
-        });
-    });
+    Updates.fetchUpdateAsync();
 };
 /**
  * Runs an update by calling [`Updates.reloadAsync()`](https://docs.expo.dev/versions/latest/sdk/updates/#updatesreloadasync).
@@ -62,12 +29,7 @@ export const downloadUpdate = () => {
  * If an error occurs, the `error` property will be set.
  */
 export const runUpdate = () => {
-    Updates.reloadAsync().catch((error) => {
-        emitEvent({
-            type: UseUpdatesEventType.ERROR,
-            error,
-        });
-    });
+    Updates.reloadAsync();
 };
 /**
  * Calls `Updates.readLogEntriesAsync()` and sets the `logEntries` property to the results.
@@ -145,43 +107,42 @@ export const useUpdates = () => {
     const [updatesState, setUpdatesState] = useState({
         isUpdateAvailable: false,
         isUpdatePending: false,
+        isChecking: false,
+        isDownloading: false,
     });
+    useEffect(() => {
+        const subscription = addUpdatesStateChangeListener((event) => {
+            setUpdatesState((updatesState) => {
+                if (event.context.isChecking) {
+                    return {
+                        ...updatesState,
+                        isChecking: true,
+                        lastCheckForUpdateTimeSinceRestart: new Date(),
+                    };
+                }
+                const availableUpdate = availableUpdateFromContext(event.context);
+                return {
+                    ...updatesState,
+                    isUpdateAvailable: event.context.isUpdateAvailable,
+                    isUpdatePending: event.context.isUpdatePending || availableUpdate?.isRollback || false,
+                    isChecking: event.context.isChecking,
+                    isDownloading: event.context.isDownloading,
+                    availableUpdate,
+                    error: event.context.checkError || event.context.downloadError,
+                };
+            });
+        });
+        return () => subscription.remove();
+    }, []);
     // Set up listener for events from automatic update requests
     // that happen on startup, and use events to refresh the updates info
     // context
     useUpdateEvents((event) => {
-        const { availableUpdate, error } = availableUpdateFromEvent(event);
         switch (event.type) {
-            case UseUpdatesEventType.NO_UPDATE_AVAILABLE:
-                setUpdatesState((updatesState) => ({
-                    ...updatesState,
-                    availableUpdate,
-                    isUpdateAvailable: false,
-                    lastCheckForUpdateTimeSinceRestart: new Date(),
-                }));
-                break;
-            case UseUpdatesEventType.UPDATE_AVAILABLE:
-                setUpdatesState((updatesState) => ({
-                    ...updatesState,
-                    availableUpdate,
-                    isUpdateAvailable: true,
-                    lastCheckForUpdateTimeSinceRestart: new Date(),
-                }));
-                break;
             case UseUpdatesEventType.ERROR:
                 setUpdatesState((updatesState) => ({
                     ...updatesState,
-                    error,
-                    lastCheckForUpdateTimeSinceRestart: new Date(),
-                }));
-                break;
-            case UseUpdatesEventType.DOWNLOAD_COMPLETE:
-                setUpdatesState((updatesState) => ({
-                    ...updatesState,
-                    availableUpdate: availableUpdate || updatesState.availableUpdate,
-                    isUpdateAvailable: true,
-                    isUpdatePending: true,
-                    lastCheckForUpdateTimeSinceRestart: new Date(),
+                    error: event.error,
                 }));
                 break;
             case UseUpdatesEventType.READ_LOG_ENTRIES_COMPLETE:

@@ -1,14 +1,19 @@
 /**
  * Test app that shows some features of the Updates API
  */
+import {
+  checkForUpdate,
+  downloadUpdate,
+  useUpdates,
+  useUpdatesState,
+} from '@expo/use-updates';
 import { StatusBar } from 'expo-status-bar';
 import * as Updates from 'expo-updates';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 export default function App() {
   const [updateMessage, setUpdateMessage] = React.useState('');
-  const [updateAvailable, setUpdateAvailable] = React.useState(false);
 
   // Displays a message showing whether or not the app is running
   // a downloaded update
@@ -18,79 +23,62 @@ export default function App() {
 
   const checkAutomaticallyMessage = `Automatic check setting = ${Updates.checkAutomatically}`;
 
-  /**
-   * Async function to manually check for an available update from EAS.
-   */
-  const checkManuallyForUpdate = async () => {
-    // set a few extra params to test extra params
-    setUpdateMessage('Calling setExtraParamAsync...');
-    await Updates.setExtraParamAsync('testsetnull', 'testvalue');
-    await Updates.setExtraParamAsync('testsetnull', null);
-    await Updates.setExtraParamAsync('testparam', 'testvalue');
+  const {
+    isUpdateAvailable,
+    isUpdatePending,
+    isChecking,
+    isDownloading,
+    availableUpdate,
+    error,
+  } = useUpdates();
 
-    setUpdateMessage('Calling checkForUpdateAsync...');
-    const checkResult = await Updates.checkForUpdateAsync();
-    if (checkResult.isRollBackToEmbedded) {
-      setUpdateMessage('checkForUpdateAsync received a rollback directive...');
-      setUpdateAvailable(true);
-    } else if (checkResult.isAvailable) {
-      setUpdateMessage(
-        `checkForUpdateAsync found a new update: manifest = \n${manifestToString(
-          checkResult.manifest
-        )}...`
-      );
-      setUpdateAvailable(true);
-    } else {
-      setUpdateMessage('No new update available');
-      setUpdateAvailable(false);
-    }
-  };
+  const state = useUpdatesState();
 
-  /**
-   * Async function to fetch and load the most recent update from EAS.
-   */
-  const downloadAndRunUpdate = async () => {
-    setUpdateMessage('Downloading the new update...');
-    await Updates.fetchUpdateAsync();
-    let countdown = 5;
-    while (countdown > 0) {
-      setUpdateMessage(
-        `Downloaded update... launching it in ${countdown} seconds.`,
-      );
-      countdown = countdown - 1;
-      await delay(1000);
-    }
-    await Updates.reloadAsync();
-  };
+  useEffect(() => {
+    const checkingMessage = isChecking ? 'Checking for an update...\n' : '';
+    const downloadingMessage = isDownloading ? 'Downloading...\n' : '';
+    const availableMessage = isUpdateAvailable
+      ? availableUpdate?.isRollback
+        ? 'Rollback directive found\n'
+        : `Found a new update: manifest = \n${manifestToString(
+            availableUpdate?.manifest,
+          )}...` + '\n'
+      : 'No new update available\n';
+    const errorMessage = error ? `Error in update API: ${error.message}` : '';
+    setUpdateMessage(
+      checkingMessage + downloadingMessage + availableMessage + errorMessage,
+    );
+  }, [isUpdateAvailable, isUpdatePending, isChecking, isDownloading, error]);
 
-  /**
-   * Sample UpdateEvent listener that handles all three event types.
-   * These events occur during app startup, when expo-updates native code
-   * automatically checks for available updates from EAS.
-   * @param {} event The event to handle
-   */
-  const eventListener = (event: Updates.UpdateEvent) => {
-    if (event.type === Updates.UpdateEventType.ERROR) {
-      setUpdateMessage(`Error: ${event.message}`);
-    } else if (event.type === Updates.UpdateEventType.NO_UPDATE_AVAILABLE) {
-      setUpdateMessage('No new update available');
-    } else if (event.type === Updates.UpdateEventType.UPDATE_AVAILABLE) {
-      setUpdateMessage(`New update available\n${manifestToString(event.manifest)}`);
-      setUpdateAvailable(true);
+  useEffect(() => {
+    const handleReloadAsync = async () => {
+      let countdown = 5;
+      while (countdown > 0) {
+        setUpdateMessage(
+          `Downloaded update... launching it in ${countdown} seconds.`,
+        );
+        countdown = countdown - 1;
+        await delay(1000);
+      }
+      await Updates.reloadAsync();
+    };
+    if (isUpdatePending) {
+      handleReloadAsync();
     }
-  };
-  Updates.useUpdateEvents(eventListener);
+  }, [isUpdatePending]);
+
+  useEffect(() => {
+    if (error) {
+      setUpdateMessage(`Error in update API: ${error.message}`);
+    }
+  }, [error]);
 
   const handleCheckButtonPress = () => {
-    checkManuallyForUpdate().catch((error) => {
-      setUpdateMessage(`Error checking for updates: ${error.message}`);
-    });
+    checkForUpdate();
   };
 
   const handleDownloadButtonPress = () => {
-    downloadAndRunUpdate().catch((error) => {
-      setUpdateMessage(`Error downloading and running update: ${error.message}`);
-    });
+    downloadUpdate();
   };
 
   return (
@@ -102,10 +90,11 @@ export default function App() {
       <Text> </Text>
       <Text style={styles.titleText}>Status</Text>
       <Text style={styles.updateMessageText}>{updateMessage}</Text>
+      <Text style={styles.updateMessageText}>{JSON.stringify(state)}</Text>
       <Pressable style={styles.button} onPress={handleCheckButtonPress}>
         <Text style={styles.buttonText}>Check manually for updates</Text>
       </Pressable>
-      {updateAvailable ? (
+      {isUpdateAvailable ? (
         <Pressable style={styles.button} onPress={handleDownloadButtonPress}>
           <Text style={styles.buttonText}>Download update</Text>
         </Pressable>
@@ -169,10 +158,10 @@ const manifestToString = (manifest?: Updates.Manifest) => {
         {
           id: manifest.id,
           createdAt: manifest.createdAt,
-          metadata: manifest.metadata,
+          // metadata: manifest.metadata,
         },
         null,
-        2
+        2,
       )
     : 'null';
 };

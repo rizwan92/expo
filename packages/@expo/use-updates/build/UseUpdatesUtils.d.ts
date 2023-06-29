@@ -1,12 +1,11 @@
-import type { AvailableUpdateInfo, CurrentlyRunningInfo, Manifest, UseUpdatesEvent } from './UseUpdates.types';
+import type { CurrentlyRunningInfo } from './UseUpdates.types';
 export declare const currentlyRunning: CurrentlyRunningInfo;
-export declare const availableUpdateFromManifest: (manifest?: Manifest) => {
-    updateId: string | null;
+export declare const availableUpdateFromContext: (context: {
+    [key: string]: any;
+}) => {
+    updateId: any;
     createdAt: Date | null;
-    manifest: Manifest;
+    manifest: any;
+    isRollback: any;
 } | undefined;
-export declare const availableUpdateFromEvent: (event: UseUpdatesEvent) => {
-    availableUpdate?: AvailableUpdateInfo;
-    error?: Error;
-};
 //# sourceMappingURL=UseUpdatesUtils.d.ts.map
