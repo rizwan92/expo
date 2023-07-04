@@ -37,7 +37,7 @@ public final class ImageView: ExpoView {
 
   var blurRadius: CGFloat = 0.0
 
-  var imageTintColor: UIColor = .clear
+  var imageTintColor: UIColor?
 
   var cachePolicy: ImageCachePolicy = .disk
 
@@ -297,15 +297,15 @@ public final class ImageView: ExpoView {
     guard isViewEmpty || !hasAnySource, let placeholder = placeholderImage else {
       return
     }
-    setImage(placeholder, contentFit: placeholderContentFit)
+    setImage(placeholder, contentFit: placeholderContentFit, isPlaceholder: true)
   }
 
   // MARK: - Processing
 
   private func createTransformPipeline() -> SDImagePipelineTransformer {
     let transformers: [SDImageTransformer] = [
-      SDImageBlurTransformer(radius: blurRadius),
-      SDImageTintTransformer(color: imageTintColor)
+      SDImageBlurTransformer(radius: blurRadius)//,
+//      SDImageTintTransformer(color: imageTintColor)
     ]
     return SDImagePipelineTransformer(transformers: transformers)
   }
@@ -338,17 +338,24 @@ public final class ImageView: ExpoView {
 
       UIView.transition(with: sdImageView, duration: seconds, options: options) { [weak self] in
         if let self = self {
-          self.setImage(image, contentFit: self.contentFit)
+          self.setImage(image, contentFit: self.contentFit, isPlaceholder: false)
         }
       }
     } else {
-      setImage(image, contentFit: contentFit)
+      setImage(image, contentFit: contentFit, isPlaceholder: false)
     }
   }
 
-  private func setImage(_ image: UIImage?, contentFit: ContentFit) {
+  private func setImage(_ image: UIImage?, contentFit: ContentFit, isPlaceholder: Bool) {
     sdImageView.contentMode = contentFit.toContentMode()
-    sdImageView.image = image
+
+    if let imageTintColor, !isPlaceholder {
+      sdImageView.image = image?.withRenderingMode(.alwaysTemplate)
+      sdImageView.tintColor = imageTintColor
+    } else {
+      sdImageView.image = image
+      sdImageView.tintColor = nil
+    }
 
     if enableLiveTextInteraction {
       analyzeImage()
