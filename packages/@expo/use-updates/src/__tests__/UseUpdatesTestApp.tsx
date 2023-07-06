@@ -9,6 +9,7 @@ const UseUpdatesTestApp = () => {
   const {
     currentlyRunning,
     availableUpdate,
+    downloadedUpdate,
     isUpdateAvailable,
     isUpdatePending,
     error,
@@ -29,6 +30,8 @@ const UseUpdatesTestApp = () => {
       </Text>
       {/* Available update, if one is present */}
       <Text testID="availableUpdate_updateId">{availableUpdate?.updateId || ''}</Text>
+      {/* Downloaded update, if one is present */}
+      <Text testID="downloadedUpdate_updateId">{downloadedUpdate?.updateId || ''}</Text>
       {/* Booleans */}
       <Text testID="isUpdateAvailable">{`${isUpdateAvailable}`}</Text>
       <Text testID="isUpdatePending">{`${isUpdatePending}`}</Text>

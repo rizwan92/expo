@@ -2,7 +2,7 @@ import * as Updates from 'expo-updates';
 import { useEffect, useState } from 'react';
 import { UseUpdatesEventType } from './UseUpdates.types';
 import { emitUseUpdatesEvent, useUpdateEvents, addUpdatesStateChangeListener, } from './UseUpdatesEmitter';
-import { currentlyRunning, availableUpdateFromContext } from './UseUpdatesUtils';
+import { currentlyRunning, availableUpdateFromContext, downloadedUpdateFromContext, } from './UseUpdatesUtils';
 /**
  * Calls [`Updates.checkForUpdateAsync()`](https://docs.expo.dev/versions/latest/sdk/updates/#updatescheckforupdateasync)
  * and refreshes the `availableUpdate` property with the result.
@@ -121,6 +121,7 @@ export const useUpdates = () => {
                     };
                 }
                 const availableUpdate = availableUpdateFromContext(event.context);
+                const downloadedUpdate = downloadedUpdateFromContext(event.context);
                 return {
                     ...updatesState,
                     isUpdateAvailable: event.context.isUpdateAvailable,
@@ -128,6 +129,7 @@ export const useUpdates = () => {
                     isChecking: event.context.isChecking,
                     isDownloading: event.context.isDownloading,
                     availableUpdate,
+                    downloadedUpdate,
                     error: event.context.checkError || event.context.downloadError,
                 };
             });

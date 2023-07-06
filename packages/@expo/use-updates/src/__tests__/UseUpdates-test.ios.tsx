@@ -181,6 +181,8 @@ describe('useUpdates()', () => {
       });
       const isUpdateAvailableView = await screen.findByTestId('isUpdateAvailable');
       expect(isUpdateAvailableView).toHaveTextContent('true');
+      const updateIdView = await screen.findByTestId('downloadedUpdate_updateId');
+      expect(updateIdView).toHaveTextContent('0000-2222');
       const isUpdatePendingView = await screen.findByTestId('isUpdatePending');
       expect(isUpdatePendingView).toHaveTextContent('true');
     });

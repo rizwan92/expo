@@ -1,6 +1,6 @@
 export type {
   CurrentlyRunningInfo,
-  AvailableUpdateInfo,
+  UpdateInfo as AvailableUpdateInfo,
   UseUpdatesReturnType,
 } from './UseUpdates.types';
 export * from './UseUpdates';

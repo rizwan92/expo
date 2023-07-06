@@ -7,7 +7,11 @@ import {
   useUpdateEvents,
   addUpdatesStateChangeListener,
 } from './UseUpdatesEmitter';
-import { currentlyRunning, availableUpdateFromContext } from './UseUpdatesUtils';
+import {
+  currentlyRunning,
+  availableUpdateFromContext,
+  downloadedUpdateFromContext,
+} from './UseUpdatesUtils';
 
 /**
  * Calls [`Updates.checkForUpdateAsync()`](https://docs.expo.dev/versions/latest/sdk/updates/#updatescheckforupdateasync)
@@ -131,6 +135,7 @@ export const useUpdates: () => UseUpdatesReturnType = () => {
           };
         }
         const availableUpdate = availableUpdateFromContext(event.context);
+        const downloadedUpdate = downloadedUpdateFromContext(event.context);
         return {
           ...updatesState,
           isUpdateAvailable: event.context.isUpdateAvailable,
@@ -138,6 +143,7 @@ export const useUpdates: () => UseUpdatesReturnType = () => {
           isChecking: event.context.isChecking,
           isDownloading: event.context.isDownloading,
           availableUpdate,
+          downloadedUpdate,
           error: event.context.checkError || event.context.downloadError,
         };
       });

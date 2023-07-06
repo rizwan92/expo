@@ -1,1 +1,1 @@
-{"version":3,"file":"UseUpdatesUtils.d.ts","sourceRoot":"","sources":["../src/UseUpdatesUtils.ts"],"names":[],"mappings":"AAEA,OAAO,KAAK,EAAE,oBAAoB,EAAE,MAAM,oBAAoB,CAAC;AAG/D,eAAO,MAAM,gBAAgB,EAAE,oBAQ9B,CAAC;AAKF,eAAO,MAAM,0BAA0B;;;;;;;aAgBtC,CAAC"}
+{"version":3,"file":"UseUpdatesUtils.d.ts","sourceRoot":"","sources":["../src/UseUpdatesUtils.ts"],"names":[],"mappings":"AAEA,OAAO,KAAK,EAAE,oBAAoB,EAAE,MAAM,oBAAoB,CAAC;AAG/D,eAAO,MAAM,gBAAgB,EAAE,oBAQ9B,CAAC;AAKF,eAAO,MAAM,0BAA0B;;;;;;;aAgBtC,CAAC;AAGF,eAAO,MAAM,2BAA2B;;;;;;;aAgBvC,CAAC"}

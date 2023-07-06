@@ -63,10 +63,9 @@ export type CurrentlyRunningInfo = {
 };
 
 /**
- * Structure representing an available update that has been returned by a call to [`checkForUpdate()`](#checkforupdate)
- * or an [`UpdateEvent`](#updateevent) emitted by native code.
+ * Structure representing an available or downloaded update.
  */
-export type AvailableUpdateInfo = {
+export type UpdateInfo = {
   /**
    * A string that uniquely identifies the update. For the manifests used in the current Expo Updates protocol (including
    * EAS Update), this represents the update's UUID in its canonical string form (`xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`)
@@ -101,7 +100,12 @@ export type UseUpdatesReturnType = {
    * or by the `UpdateEvent` listener in `useUpdates()`,
    * this will contain the information for that update.
    */
-  availableUpdate?: AvailableUpdateInfo;
+  availableUpdate?: UpdateInfo;
+  /**
+   * If an available update has been downloaded, this will contain the information
+   * for that update.
+   */
+  downloadedUpdate?: UpdateInfo;
   /**
    * True if a new available update has been found, false otherwise.
    */
@@ -138,7 +142,8 @@ export type UseUpdatesReturnType = {
 
 // Type for the state managed by useUpdates(). Used internally by this module and not exported publicly.
 export type UseUpdatesStateType = {
-  availableUpdate?: AvailableUpdateInfo;
+  availableUpdate?: UpdateInfo;
+  downloadedUpdate?: UpdateInfo;
   error?: Error;
   isUpdateAvailable: boolean;
   isUpdatePending: boolean;

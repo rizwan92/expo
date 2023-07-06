@@ -24,8 +24,7 @@
 
 Ƭ **AvailableUpdateInfo**: `Object`
 
-Structure representing an available update that has been returned by a call to [`checkForUpdate()`](#checkforupdate)
-or an [`UpdateEvent`](#updateevent) emitted by native code.
+Structure representing an available or downloaded update.
 
 #### Type declaration
 
@@ -38,7 +37,7 @@ or an [`UpdateEvent`](#updateevent) emitted by native code.
 
 #### Defined in
 
-[UseUpdates.types.ts:69](https://github.com/expo/expo/blob/af6152ebd4/packages/@expo/use-updates/src/UseUpdates.types.ts#L69)
+[UseUpdates.types.ts:68](https://github.com/expo/expo/blob/fa06932cc3/packages/@expo/use-updates/src/UseUpdates.types.ts#L68)
 
 ___
 
@@ -63,7 +62,7 @@ Structure encapsulating information on the currently running app
 
 #### Defined in
 
-[UseUpdates.types.ts:15](https://github.com/expo/expo/blob/af6152ebd4/packages/@expo/use-updates/src/UseUpdates.types.ts#L15)
+[UseUpdates.types.ts:15](https://github.com/expo/expo/blob/fa06932cc3/packages/@expo/use-updates/src/UseUpdates.types.ts#L15)
 
 ___
 
@@ -79,6 +78,7 @@ The structures and methods returned by `useUpdates()`.
 | :------ | :------ | :------ |
 | `availableUpdate?` | [`AvailableUpdateInfo`](modules.md#availableupdateinfo) | If a new available update has been found, either by using checkForUpdate(), or by the `UpdateEvent` listener in `useUpdates()`, this will contain the information for that update. |
 | `currentlyRunning` | [`CurrentlyRunningInfo`](modules.md#currentlyrunninginfo) | Information on the currently running app |
+| `downloadedUpdate?` | [`AvailableUpdateInfo`](modules.md#availableupdateinfo) | If an available update has been downloaded, this will contain the information for that update. |
 | `error?` | `Error` | If an error is returned by any of the APIs to check for, download, or launch updates, the error description will appear here. |
 | `isChecking` | `boolean` | True if the app is currently checking for a new available update from the server. |
 | `isDownloading` | `boolean` | True if the app is currently downloading an update from the server. |
@@ -89,7 +89,7 @@ The structures and methods returned by `useUpdates()`.
 
 #### Defined in
 
-[UseUpdates.types.ts:94](https://github.com/expo/expo/blob/af6152ebd4/packages/@expo/use-updates/src/UseUpdates.types.ts#L94)
+[UseUpdates.types.ts:93](https://github.com/expo/expo/blob/fa06932cc3/packages/@expo/use-updates/src/UseUpdates.types.ts#L93)
 
 ## Functions
 
@@ -107,7 +107,7 @@ If an error occurs, the `error` property will be set.
 
 #### Defined in
 
-[UseUpdates.ts:17](https://github.com/expo/expo/blob/af6152ebd4/packages/@expo/use-updates/src/UseUpdates.ts#L17)
+[UseUpdates.ts:21](https://github.com/expo/expo/blob/fa06932cc3/packages/@expo/use-updates/src/UseUpdates.ts#L21)
 
 ___
 
@@ -126,7 +126,7 @@ If an error occurs, the `error` property will be set.
 
 #### Defined in
 
-[UseUpdates.ts:26](https://github.com/expo/expo/blob/af6152ebd4/packages/@expo/use-updates/src/UseUpdates.ts#L26)
+[UseUpdates.ts:30](https://github.com/expo/expo/blob/fa06932cc3/packages/@expo/use-updates/src/UseUpdates.ts#L30)
 
 ___
 
@@ -149,7 +149,7 @@ If an error occurs, the `error` property will be set.
 
 #### Defined in
 
-[UseUpdates.ts:48](https://github.com/expo/expo/blob/af6152ebd4/packages/@expo/use-updates/src/UseUpdates.ts#L48)
+[UseUpdates.ts:52](https://github.com/expo/expo/blob/fa06932cc3/packages/@expo/use-updates/src/UseUpdates.ts#L52)
 
 ___
 
@@ -170,7 +170,7 @@ If an error occurs, the `error` property will be set.
 
 #### Defined in
 
-[UseUpdates.ts:38](https://github.com/expo/expo/blob/af6152ebd4/packages/@expo/use-updates/src/UseUpdates.ts#L38)
+[UseUpdates.ts:42](https://github.com/expo/expo/blob/fa06932cc3/packages/@expo/use-updates/src/UseUpdates.ts#L42)
 
 ___
 
@@ -235,4 +235,4 @@ the structures with information on currently running and available updates.
 
 #### Defined in
 
-[UseUpdates.ts:115](https://github.com/expo/expo/blob/af6152ebd4/packages/@expo/use-updates/src/UseUpdates.ts#L115)
+[UseUpdates.ts:119](https://github.com/expo/expo/blob/fa06932cc3/packages/@expo/use-updates/src/UseUpdates.ts#L119)

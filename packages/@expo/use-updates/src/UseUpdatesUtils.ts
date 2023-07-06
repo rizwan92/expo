@@ -15,9 +15,28 @@ export const currentlyRunning: CurrentlyRunningInfo = {
 
 /////// Internal functions ////////
 
-// Constructs the availableUpdate from the update manifest
+// Constructs the availableUpdate from the native state change event context
 export const availableUpdateFromContext = (context: { [key: string]: any }) => {
   const manifest = context?.latestManifest;
+  const isRollback = context.isRollback;
+  return manifest || isRollback
+    ? {
+        updateId: manifest?.id ?? null,
+        createdAt:
+          manifest && 'createdAt' in manifest && manifest.createdAt
+            ? new Date(manifest.createdAt)
+            : manifest && 'publishedTime' in manifest && manifest.publishedTime
+            ? new Date(manifest.publishedTime)
+            : null,
+        manifest: manifest || null,
+        isRollback,
+      }
+    : undefined;
+};
+
+// Constructs the downloadedUpdate from the native state change event context
+export const downloadedUpdateFromContext = (context: { [key: string]: any }) => {
+  const manifest = context?.downloadedManifest;
   const isRollback = context.isRollback;
   return manifest || isRollback
     ? {
