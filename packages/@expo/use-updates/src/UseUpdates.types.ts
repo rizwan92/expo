@@ -136,7 +136,7 @@ export type UseUpdatesReturnType = {
   logEntries?: UpdatesLogEntry[];
 };
 
-// Internal type for the state managed by useUpdates()
+// Type for the state managed by useUpdates(). Used internally by this module and not exported publicly.
 export type UseUpdatesStateType = {
   availableUpdate?: AvailableUpdateInfo;
   error?: Error;
@@ -178,4 +178,22 @@ export type UseUpdatesEvent = {
    * If `type` is `UseUpdatesEventType.READ_LOG_ENTRIES_COMPLETE`, the log entries returned, and `undefined` otherwise.
    */
   logEntries?: UpdatesLogEntry[];
+};
+
+/**
+ * An event emitted when native state changes; used internally by this module and not exported publicly.
+ */
+export type UpdatesNativeStateChangeEvent = {
+  context: {
+    isUpdateAvailable: boolean;
+    isUpdatePending: boolean;
+    isChecking: boolean;
+    isDownloading: boolean;
+    isRollback: boolean;
+    isRestarting: boolean;
+    latestManifest?: Manifest;
+    downloadedManifest?: Manifest;
+    checkError?: Error;
+    downloadError?: Error;
+  };
 };

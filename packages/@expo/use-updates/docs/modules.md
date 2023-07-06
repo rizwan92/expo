@@ -17,7 +17,6 @@
 - [readLogEntries](modules.md#readlogentries)
 - [runUpdate](modules.md#runupdate)
 - [useUpdates](modules.md#useupdates)
-- [useUpdatesState](modules.md#useupdatesstate)
 
 ## Type Aliases
 
@@ -39,7 +38,7 @@ or an [`UpdateEvent`](#updateevent) emitted by native code.
 
 #### Defined in
 
-[UseUpdates.types.ts:69](https://github.com/expo/expo/blob/9e4a524f5c/packages/@expo/use-updates/src/UseUpdates.types.ts#L69)
+[UseUpdates.types.ts:69](https://github.com/expo/expo/blob/af6152ebd4/packages/@expo/use-updates/src/UseUpdates.types.ts#L69)
 
 ___
 
@@ -64,7 +63,7 @@ Structure encapsulating information on the currently running app
 
 #### Defined in
 
-[UseUpdates.types.ts:15](https://github.com/expo/expo/blob/9e4a524f5c/packages/@expo/use-updates/src/UseUpdates.types.ts#L15)
+[UseUpdates.types.ts:15](https://github.com/expo/expo/blob/af6152ebd4/packages/@expo/use-updates/src/UseUpdates.types.ts#L15)
 
 ___
 
@@ -90,7 +89,7 @@ The structures and methods returned by `useUpdates()`.
 
 #### Defined in
 
-[UseUpdates.types.ts:94](https://github.com/expo/expo/blob/9e4a524f5c/packages/@expo/use-updates/src/UseUpdates.types.ts#L94)
+[UseUpdates.types.ts:94](https://github.com/expo/expo/blob/af6152ebd4/packages/@expo/use-updates/src/UseUpdates.types.ts#L94)
 
 ## Functions
 
@@ -108,7 +107,7 @@ If an error occurs, the `error` property will be set.
 
 #### Defined in
 
-[UseUpdates.ts:13](https://github.com/expo/expo/blob/9e4a524f5c/packages/@expo/use-updates/src/UseUpdates.ts#L13)
+[UseUpdates.ts:17](https://github.com/expo/expo/blob/af6152ebd4/packages/@expo/use-updates/src/UseUpdates.ts#L17)
 
 ___
 
@@ -127,7 +126,7 @@ If an error occurs, the `error` property will be set.
 
 #### Defined in
 
-[UseUpdates.ts:22](https://github.com/expo/expo/blob/9e4a524f5c/packages/@expo/use-updates/src/UseUpdates.ts#L22)
+[UseUpdates.ts:26](https://github.com/expo/expo/blob/af6152ebd4/packages/@expo/use-updates/src/UseUpdates.ts#L26)
 
 ___
 
@@ -150,7 +149,7 @@ If an error occurs, the `error` property will be set.
 
 #### Defined in
 
-[UseUpdates.ts:44](https://github.com/expo/expo/blob/9e4a524f5c/packages/@expo/use-updates/src/UseUpdates.ts#L44)
+[UseUpdates.ts:48](https://github.com/expo/expo/blob/af6152ebd4/packages/@expo/use-updates/src/UseUpdates.ts#L48)
 
 ___
 
@@ -171,7 +170,7 @@ If an error occurs, the `error` property will be set.
 
 #### Defined in
 
-[UseUpdates.ts:34](https://github.com/expo/expo/blob/9e4a524f5c/packages/@expo/use-updates/src/UseUpdates.ts#L34)
+[UseUpdates.ts:38](https://github.com/expo/expo/blob/af6152ebd4/packages/@expo/use-updates/src/UseUpdates.ts#L38)
 
 ___
 
@@ -236,25 +235,4 @@ the structures with information on currently running and available updates.
 
 #### Defined in
 
-[UseUpdates.ts:111](https://github.com/expo/expo/blob/9e4a524f5c/packages/@expo/use-updates/src/UseUpdates.ts#L111)
-
-___
-
-### useUpdatesState
-
-▸ **useUpdatesState**(): `Object`
-
-Experimental hook to return the Updates state machine context maintained
-in native code.
-
-Eventually, this will be used to construct the information returned by `useUpdates()`.
-
-#### Returns
-
-`Object`
-
-A map of the state machine context.
-
-#### Defined in
-
-[UseUpdates.ts:181](https://github.com/expo/expo/blob/9e4a524f5c/packages/@expo/use-updates/src/UseUpdates.ts#L181)
+[UseUpdates.ts:115](https://github.com/expo/expo/blob/af6152ebd4/packages/@expo/use-updates/src/UseUpdates.ts#L115)

@@ -4,6 +4,8 @@ import type { Manifest, UpdatesLogEntry } from 'expo-updates';
 import '@testing-library/jest-native/extend-expect';
 import React from 'react';
 
+import { UpdatesNativeStateChangeEvent } from '../UseUpdates.types';
+import { emitStateChangeEvent } from '../UseUpdatesEmitter';
 import { availableUpdateFromContext } from '../UseUpdatesUtils';
 import UseUpdatesTestApp from './UseUpdatesTestApp';
 
@@ -25,6 +27,93 @@ jest.mock('expo-updates', () => {
 
 describe('useUpdates()', () => {
   describe('Component tests', () => {
+    const mockDate = new Date();
+    const mockManifest = {
+      id: '0000-2222',
+      createdAt: mockDate.toISOString(),
+      runtimeVersion: '1.0.0',
+      launchAsset: {
+        url: 'testUrl',
+      },
+      assets: [],
+      metadata: {},
+    };
+    const mockError = { name: 'UpdatesError', code: 'ERR_TEST', message: 'test message' };
+    const isCheckingEvent: UpdatesNativeStateChangeEvent = {
+      context: {
+        isUpdateAvailable: false,
+        isUpdatePending: false,
+        isRollback: false,
+        isRestarting: false,
+        isChecking: true,
+        isDownloading: false,
+      },
+    };
+    const updateAvailableEvent: UpdatesNativeStateChangeEvent = {
+      context: {
+        isUpdateAvailable: true,
+        isUpdatePending: false,
+        isRollback: false,
+        isRestarting: false,
+        isChecking: false,
+        isDownloading: false,
+        latestManifest: mockManifest,
+      },
+    };
+    const updateUnavailableEvent: UpdatesNativeStateChangeEvent = {
+      context: {
+        isUpdateAvailable: false,
+        isUpdatePending: false,
+        isRollback: false,
+        isRestarting: false,
+        isChecking: false,
+        isDownloading: false,
+      },
+    };
+    const checkErrorEvent: UpdatesNativeStateChangeEvent = {
+      context: {
+        isUpdateAvailable: false,
+        isUpdatePending: false,
+        isRollback: false,
+        isRestarting: false,
+        isChecking: false,
+        isDownloading: false,
+        checkError: mockError,
+      },
+    };
+    const isDownloadingEvent: UpdatesNativeStateChangeEvent = {
+      context: {
+        isUpdateAvailable: false,
+        isUpdatePending: false,
+        isRollback: false,
+        isRestarting: false,
+        isChecking: false,
+        isDownloading: true,
+      },
+    };
+    const updateDownloadedEvent: UpdatesNativeStateChangeEvent = {
+      context: {
+        isUpdateAvailable: true,
+        isUpdatePending: true,
+        isRollback: false,
+        isRestarting: false,
+        isChecking: false,
+        isDownloading: false,
+        latestManifest: mockManifest,
+        downloadedManifest: mockManifest,
+      },
+    };
+    const downloadErrorEvent: UpdatesNativeStateChangeEvent = {
+      context: {
+        isUpdateAvailable: false,
+        isUpdatePending: false,
+        isRollback: false,
+        isRestarting: false,
+        isChecking: false,
+        isDownloading: false,
+        downloadError: mockError,
+      },
+    };
     it('Shows currently running info', async () => {
       render(<UseUpdatesTestApp />);
       const updateIdView = await screen.findByTestId('currentlyRunning_updateId');
@@ -34,29 +123,12 @@ describe('useUpdates()', () => {
       const channelView = await screen.findByTestId('currentlyRunning_channel');
       expect(channelView).toHaveTextContent('main');
     });
-    /*
-    it('Shows available update after running checkForUpdate()', async () => {
+
+    it('Shows available update after receiving state change', async () => {
       render(<UseUpdatesTestApp />);
-      const mockDate = new Date();
-      const mockManifest = {
-        id: '0000-2222',
-        createdAt: mockDate.toISOString(),
-        runtimeVersion: '1.0.0',
-        launchAsset: {
-          url: 'testUrl',
-        },
-        assets: [],
-        metadata: {},
-      };
-      const mockResponse: UpdateCheckResult = {
-        isAvailable: true,
-        isRollBackToEmbedded: false,
-        manifest: mockManifest,
-      };
-      jest.spyOn(Updates, 'checkForUpdateAsync').mockResolvedValueOnce(mockResponse);
-      const buttonView = await screen.findByTestId('checkForUpdate');
       await act(async () => {
-        fireEvent(buttonView, 'press');
+        emitStateChangeEvent(isCheckingEvent);
+        emitStateChangeEvent(updateAvailableEvent);
       });
       const lastCheckForUpdateTime = new Date();
       const updateIdView = await screen.findByTestId('availableUpdate_updateId');
@@ -70,17 +142,11 @@ describe('useUpdates()', () => {
       expect(isUpdateAvailableView).toHaveTextContent('true');
     });
 
-    it('Shows no available update after running checkForUpdate()', async () => {
+    it('Shows no available update after receiving state change', async () => {
       render(<UseUpdatesTestApp />);
-      const mockResponse: UpdateCheckResult = {
-        isAvailable: false,
-        isRollBackToEmbedded: false,
-        manifest: undefined,
-      };
-      jest.spyOn(Updates, 'checkForUpdateAsync').mockResolvedValueOnce(mockResponse);
-      const buttonView = await screen.findByTestId('checkForUpdate');
       await act(async () => {
-        fireEvent(buttonView, 'press');
+        emitStateChangeEvent(isCheckingEvent);
+        emitStateChangeEvent(updateUnavailableEvent);
       });
       const updateIdView = await screen.findByTestId('availableUpdate_updateId');
       // No update so text is empty
@@ -97,11 +163,9 @@ describe('useUpdates()', () => {
 
     it('Handles error in checkForUpdate()', async () => {
       render(<UseUpdatesTestApp />);
-      const mockError = { code: 'ERR_TEST', message: 'test message' };
-      jest.spyOn(Updates, 'checkForUpdateAsync').mockRejectedValueOnce(mockError);
-      const buttonView = await screen.findByTestId('checkForUpdate');
       await act(async () => {
-        fireEvent(buttonView, 'press');
+        emitStateChangeEvent(isCheckingEvent);
+        emitStateChangeEvent(checkErrorEvent);
       });
       const errorView = await screen.findByTestId('error');
       expect(errorView).toHaveTextContent('test message');
@@ -109,64 +173,11 @@ describe('useUpdates()', () => {
       expect(isUpdateAvailableView).toHaveTextContent('false');
     });
 
-    it('downloadUpdate() succeeds when manifest included in event', async () => {
+    it('Shows downloaded update after receiving state change', async () => {
       render(<UseUpdatesTestApp />);
-      const mockDate = new Date();
-      const mockManifest = {
-        id: '0000-2222',
-        createdAt: mockDate.toISOString(),
-        runtimeVersion: '1.0.0',
-        launchAsset: {
-          url: 'testUrl',
-        },
-        assets: [],
-        metadata: {},
-      };
-      const mockDownloadResponse: any = {
-        isNew: true,
-        manifest: mockManifest,
-      };
-      jest.spyOn(Updates, 'fetchUpdateAsync').mockResolvedValueOnce(mockDownloadResponse);
-      const buttonView = await screen.findByTestId('downloadUpdate');
       await act(async () => {
-        fireEvent(buttonView, 'press');
-      });
-      const isUpdateAvailableView = await screen.findByTestId('isUpdateAvailable');
-      expect(isUpdateAvailableView).toHaveTextContent('true');
-      const isUpdatePendingView = await screen.findByTestId('isUpdatePending');
-      expect(isUpdatePendingView).toHaveTextContent('true');
-    });
-
-    it('downloadUpdate() succeeds when manifest not included in event, checkForUpdate has already run successfully', async () => {
-      render(<UseUpdatesTestApp />);
-      const mockDate = new Date();
-      const mockManifest = {
-        id: '0000-2222',
-        createdAt: mockDate.toISOString(),
-        runtimeVersion: '1.0.0',
-        launchAsset: {
-          url: 'testUrl',
-        },
-        assets: [],
-        metadata: {},
-      };
-      const mockCheckResponse: UpdateCheckResult = {
-        isAvailable: true,
-        isRollBackToEmbedded: false,
-        manifest: mockManifest,
-      };
-      const mockDownloadResponse: any = {
-        isNew: false,
-      };
-      jest.spyOn(Updates, 'checkForUpdateAsync').mockResolvedValueOnce(mockCheckResponse);
-      jest.spyOn(Updates, 'fetchUpdateAsync').mockResolvedValueOnce(mockDownloadResponse);
-      const checkButtonView = await screen.findByTestId('checkForUpdate');
-      await act(async () => {
-        fireEvent(checkButtonView, 'press');
-      });
-      const downloadButtonView = await screen.findByTestId('downloadUpdate');
-      await act(async () => {
-        fireEvent(downloadButtonView, 'press');
+        emitStateChangeEvent(isDownloadingEvent);
+        emitStateChangeEvent(updateDownloadedEvent);
       });
       const isUpdateAvailableView = await screen.findByTestId('isUpdateAvailable');
       expect(isUpdateAvailableView).toHaveTextContent('true');
@@ -176,11 +187,9 @@ describe('useUpdates()', () => {
 
     it('Handles error during downloadUpdate()', async () => {
       render(<UseUpdatesTestApp />);
-      const mockError = { code: 'ERR_TEST', message: 'test message' };
-      jest.spyOn(Updates, 'fetchUpdateAsync').mockRejectedValueOnce(mockError);
-      const buttonView = await screen.findByTestId('downloadUpdate');
       await act(async () => {
-        fireEvent(buttonView, 'press');
+        emitStateChangeEvent(isDownloadingEvent);
+        emitStateChangeEvent(downloadErrorEvent);
       });
       const errorView = await screen.findByTestId('error');
       expect(errorView).toHaveTextContent('test message');
@@ -189,7 +198,7 @@ describe('useUpdates()', () => {
       const isUpdatePendingView = await screen.findByTestId('isUpdatePending');
       expect(isUpdatePendingView).toHaveTextContent('false');
     });
- */
+
     it('Shows log entries after running readLogEntries()', async () => {
       const logEntry: UpdatesLogEntry = {
         timestamp: 100,

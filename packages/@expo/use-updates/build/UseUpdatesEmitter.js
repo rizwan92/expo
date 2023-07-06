@@ -13,10 +13,32 @@ function _getEmitter() {
     }
     return _emitter;
 }
-function _addListener(listener) {
+function addUseUpdatesListener(listener) {
     const emitter = _getEmitter();
     return emitter.addListener('Expo.useUpdatesEvent', listener);
 }
+// What JS code uses to emit events used internally by this module
+export const emitUseUpdatesEvent = (event) => {
+    if (!_emitter) {
+        throw new Error(`EventEmitter must be initialized to use from its listener`);
+    }
+    _emitter.emit('Expo.useUpdatesEvent', event);
+};
+export const useUpdateEvents = (listener) => {
+    const listenerRef = useRef();
+    useEffect(() => {
+        listenerRef.current = listener;
+    }, [listener]);
+    useEffect(() => {
+        if (listenerRef.current) {
+            const subscription = addUseUpdatesListener(listenerRef.current);
+            return () => {
+                subscription.remove();
+            };
+        }
+        return undefined;
+    }, []);
+};
 // Handle native state change events
 function _emitNativeStateChangeEvent(params) {
     let newParams = { ...params };
@@ -36,30 +58,16 @@ function _emitNativeStateChangeEvent(params) {
     }
     _emitter?.emit('Expo.updatesStateChangeEvent', newParams);
 }
-// What JS code uses to emit events
-export const emitEvent = (event) => {
-    if (!_emitter) {
-        throw new Error(`EventEmitter must be initialized to use from its listener`);
-    }
-    _emitter.emit('Expo.useUpdatesEvent', event);
-};
-export const useUpdateEvents = (listener) => {
-    const listenerRef = useRef();
-    useEffect(() => {
-        listenerRef.current = listener;
-    }, [listener]);
-    useEffect(() => {
-        if (listenerRef.current) {
-            const subscription = _addListener(listenerRef.current);
-            return () => {
-                subscription.remove();
-            };
-        }
-        return undefined;
-    }, []);
-};
+// Add listener for state change events
 export const addUpdatesStateChangeListener = (listener) => {
     const emitter = _getEmitter();
     return emitter.addListener('Expo.updatesStateChangeEvent', listener);
+};
+// Allows JS to emit a state change event (useful for testing)
+export const emitStateChangeEvent = (event) => {
+    if (!_emitter) {
+        throw new Error(`EventEmitter must be initialized to use from its listener`);
+    }
+    _emitter?.emit('Expo.updatesStateChangeEvent', event);
 };
 //# sourceMappingURL=UseUpdatesEmitter.js.map

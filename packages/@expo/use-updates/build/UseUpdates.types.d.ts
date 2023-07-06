@@ -170,4 +170,21 @@ export type UseUpdatesEvent = {
      */
     logEntries?: UpdatesLogEntry[];
 };
+/**
+ * An event emitted when native state changes; used internally by this module and not exported publicly.
+ */
+export type UpdatesNativeStateChangeEvent = {
+    context: {
+        isUpdateAvailable: boolean;
+        isUpdatePending: boolean;
+        isChecking: boolean;
+        isDownloading: boolean;
+        isRollback: boolean;
+        isRestarting: boolean;
+        latestManifest?: Manifest;
+        downloadedManifest?: Manifest;
+        checkError?: Error;
+        downloadError?: Error;
+    };
+};
 //# sourceMappingURL=UseUpdates.types.d.ts.map
