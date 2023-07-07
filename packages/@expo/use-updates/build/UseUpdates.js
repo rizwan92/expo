@@ -2,7 +2,7 @@ import * as Updates from 'expo-updates';
 import { useEffect, useState } from 'react';
 import { UseUpdatesEventType } from './UseUpdates.types';
 import { emitUseUpdatesEvent, useUpdateEvents, addUpdatesStateChangeListener, } from './UseUpdatesEmitter';
-import { currentlyRunning, defaultUseUpdatesState, reduceUpdatesStateFromContext, readNativeContext, } from './UseUpdatesUtils';
+import { currentlyRunning, defaultUseUpdatesState, reduceUpdatesStateFromContext, readNativeContext, canReadNativeContext, } from './UseUpdatesUtils';
 /**
  * Calls [`Updates.checkForUpdateAsync()`](https://docs.expo.dev/versions/latest/sdk/updates/#updatescheckforupdateasync)
  * and refreshes the `availableUpdate` property with the result.
@@ -106,7 +106,11 @@ export const readLogEntries = (maxAge = 3600000) => {
 export const useUpdates = () => {
     const [updatesState, setUpdatesState] = useState(defaultUseUpdatesState);
     useEffect(() => {
-        setUpdatesState((updatesState) => reduceUpdatesStateFromContext(updatesState, readNativeContext()));
+        if (canReadNativeContext()) {
+            readNativeContext().then((context) => {
+                setUpdatesState((updatesState) => reduceUpdatesStateFromContext(updatesState, context));
+            });
+        }
         const subscription = addUpdatesStateChangeListener((event) => {
             setUpdatesState((updatesState) => reduceUpdatesStateFromContext(updatesState, event.context));
             return () => subscription.remove();

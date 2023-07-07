@@ -12,6 +12,7 @@ import {
   defaultUseUpdatesState,
   reduceUpdatesStateFromContext,
   readNativeContext,
+  canReadNativeContext,
 } from './UseUpdatesUtils';
 
 /**
@@ -121,9 +122,11 @@ export const useUpdates: () => UseUpdatesReturnType = () => {
   const [updatesState, setUpdatesState] = useState<UseUpdatesStateType>(defaultUseUpdatesState);
 
   useEffect(() => {
-    setUpdatesState((updatesState) =>
-      reduceUpdatesStateFromContext(updatesState, readNativeContext())
-    );
+    if (canReadNativeContext()) {
+      readNativeContext().then((context) => {
+        setUpdatesState((updatesState) => reduceUpdatesStateFromContext(updatesState, context));
+      });
+    }
 
     const subscription = addUpdatesStateChangeListener((event) => {
       setUpdatesState((updatesState) => reduceUpdatesStateFromContext(updatesState, event.context));

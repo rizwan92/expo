@@ -341,10 +341,10 @@ export function addListener(listener: (event: UpdateEvent) => void): EventSubscr
 /**
  * @hidden
  */
-export function nativeStateMachineContext(): { [key: string]: any } {
+export async function nativeStateMachineContext(): Promise<{ [key: string]: any }> {
   // Return the current state machine context
   if (!ExpoUpdates.nativeStateMachineContext) {
     throw new UnavailabilityError('Updates', 'readLogEntriesAsync');
   }
-  return ExpoUpdates.nativeStateMachineContext();
+  return await ExpoUpdates.nativeStateMachineContext();
 }

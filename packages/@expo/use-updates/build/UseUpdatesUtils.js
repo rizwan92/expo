@@ -46,7 +46,7 @@ export const downloadedUpdateFromContext = (context) => {
 };
 // Read the native context directly from expo-updates native module
 // Fall back to default if native method throws or is not available
-export const readNativeContext = () => {
+export const readNativeContext = async () => {
     const defaultContext = {
         isChecking: false,
         isDownloading: false,
@@ -55,17 +55,19 @@ export const readNativeContext = () => {
         isUpdateAvailable: false,
         isUpdatePending: false,
     };
-    if (Updates.nativeStateMachineContext) {
-        try {
-            const nativeContext = Updates.nativeStateMachineContext();
-            return {
-                ...defaultContext,
-                ...nativeContext,
-            };
-        }
-        catch { }
+    try {
+        const nativeContext = await Updates.nativeStateMachineContext();
+        return {
+            ...defaultContext,
+            ...nativeContext,
+        };
     }
+    catch { }
     return defaultContext;
+};
+// Returns true if the native context getter is present
+export const canReadNativeContext = () => {
+    return Updates.nativeStateMachineContext !== undefined;
 };
 // Default useUpdates() state
 export const defaultUseUpdatesState = {

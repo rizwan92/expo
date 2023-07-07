@@ -275,11 +275,11 @@ export function addListener(listener) {
 /**
  * @hidden
  */
-export function nativeStateMachineContext() {
+export async function nativeStateMachineContext() {
     // Return the current state machine context
     if (!ExpoUpdates.nativeStateMachineContext) {
         throw new UnavailabilityError('Updates', 'readLogEntriesAsync');
     }
-    return ExpoUpdates.nativeStateMachineContext();
+    return await ExpoUpdates.nativeStateMachineContext();
 }
 //# sourceMappingURL=Updates.js.map

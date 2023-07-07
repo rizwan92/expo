@@ -175,7 +175,7 @@ export declare function addListener(listener: (event: UpdateEvent) => void): Eve
 /**
  * @hidden
  */
-export declare function nativeStateMachineContext(): {
+export declare function nativeStateMachineContext(): Promise<{
     [key: string]: any;
-};
+}>;
 //# sourceMappingURL=Updates.d.ts.map

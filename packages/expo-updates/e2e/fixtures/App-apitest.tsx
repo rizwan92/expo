@@ -5,7 +5,6 @@ import {
   checkForUpdate,
   downloadUpdate,
   useUpdates,
-  useUpdatesState,
 } from '@expo/use-updates';
 import { StatusBar } from 'expo-status-bar';
 import * as Updates from 'expo-updates';
@@ -31,8 +30,6 @@ export default function App() {
     availableUpdate,
     error,
   } = useUpdates();
-
-  const state = useUpdatesState();
 
   useEffect(() => {
     const checkingMessage = isChecking ? 'Checking for an update...\n' : '';
@@ -90,7 +87,6 @@ export default function App() {
       <Text> </Text>
       <Text style={styles.titleText}>Status</Text>
       <Text style={styles.updateMessageText}>{updateMessage}</Text>
-      <Text style={styles.updateMessageText}>{JSON.stringify(state)}</Text>
       <Pressable style={styles.button} onPress={handleCheckButtonPress}>
         <Text style={styles.buttonText}>Check manually for updates</Text>
       </Pressable>

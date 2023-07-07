@@ -4,7 +4,6 @@ import {
   checkForUpdate,
   downloadUpdate,
   runUpdate,
-  useUpdatesState,
 } from '@expo/use-updates';
 import Constants from 'expo-constants';
 import { NativeModulesProxy } from 'expo-modules-core';
@@ -50,8 +49,6 @@ export default function App() {
   const [extraParamsString, setExtraParamsString] = React.useState('');
 
   const { currentlyRunning, availableUpdate, isUpdateAvailable, isUpdatePending } = useUpdates();
-
-  const state = useUpdatesState();
 
   Updates.useUpdateEvents((event) => {
     setLastUpdateEventType(event.type);
@@ -158,15 +155,6 @@ export default function App() {
       <TestValue testID="isEmbeddedLaunch" value={`${currentlyRunning.isEmbeddedLaunch}`} />
       <TestValue testID="availableUpdateID" value={`${availableUpdate?.updateId}`} />
       <TestValue testID="extraParamsString" value={`${extraParamsString}`} />
-
-      <TestValue testID="state.isUpdateAvailable" value={`${state.isUpdateAvailable}`} />
-      <TestValue testID="state.isUpdatePending" value={`${state.isUpdatePending}`} />
-      <TestValue testID="state.isRollback" value={`${state.isRollback}`} />
-      <TestValue testID="state.latestManifest.id" value={`${state.latestManifest?.id || ''}`} />
-      <TestValue
-        testID="state.downloadedManifest.id"
-        value={`${state.downloadedManifest?.id || ''}`}
-      />
 
       <Text>Log messages</Text>
       <ScrollView style={styles.logEntriesContainer}>

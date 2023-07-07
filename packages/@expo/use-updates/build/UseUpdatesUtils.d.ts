@@ -17,7 +17,8 @@ export declare const downloadedUpdateFromContext: (context: {
     manifest: any;
     isRollback: any;
 } | undefined;
-export declare const readNativeContext: () => UpdatesNativeStateMachineContext;
+export declare const readNativeContext: () => Promise<UpdatesNativeStateMachineContext>;
+export declare const canReadNativeContext: () => boolean;
 export declare const defaultUseUpdatesState: UseUpdatesStateType;
 export declare const reduceUpdatesStateFromContext: (updatesState: UseUpdatesStateType, context: UpdatesNativeStateMachineContext) => {
     isChecking: boolean;
