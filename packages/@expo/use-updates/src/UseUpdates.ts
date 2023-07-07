@@ -9,8 +9,9 @@ import {
 } from './UseUpdatesEmitter';
 import {
   currentlyRunning,
-  availableUpdateFromContext,
-  downloadedUpdateFromContext,
+  defaultUseUpdatesState,
+  reduceUpdatesStateFromContext,
+  readNativeContext,
 } from './UseUpdatesUtils';
 
 /**
@@ -117,43 +118,20 @@ export const readLogEntries: (maxAge?: number) => void = (maxAge: number = 36000
  * ```
  */
 export const useUpdates: () => UseUpdatesReturnType = () => {
-  const [updatesState, setUpdatesState] = useState<UseUpdatesStateType>({
-    isUpdateAvailable: false,
-    isUpdatePending: false,
-    isChecking: false,
-    isDownloading: false,
-  });
+  const [updatesState, setUpdatesState] = useState<UseUpdatesStateType>(defaultUseUpdatesState);
 
   useEffect(() => {
+    setUpdatesState((updatesState) =>
+      reduceUpdatesStateFromContext(updatesState, readNativeContext())
+    );
+
     const subscription = addUpdatesStateChangeListener((event) => {
-      setUpdatesState((updatesState) => {
-        if (event.context.isChecking) {
-          return {
-            ...updatesState,
-            isChecking: true,
-            lastCheckForUpdateTimeSinceRestart: new Date(),
-          };
-        }
-        const availableUpdate = availableUpdateFromContext(event.context);
-        const downloadedUpdate = downloadedUpdateFromContext(event.context);
-        return {
-          ...updatesState,
-          isUpdateAvailable: event.context.isUpdateAvailable,
-          isUpdatePending: event.context.isUpdatePending || availableUpdate?.isRollback || false,
-          isChecking: event.context.isChecking,
-          isDownloading: event.context.isDownloading,
-          availableUpdate,
-          downloadedUpdate,
-          error: event.context.checkError || event.context.downloadError,
-        };
-      });
+      setUpdatesState((updatesState) => reduceUpdatesStateFromContext(updatesState, event.context));
+      return () => subscription.remove();
     });
-    return () => subscription.remove();
   }, []);
 
-  // Set up listener for events from automatic update requests
-  // that happen on startup, and use events to refresh the updates info
-  // context
+  // Set up listener for events from readLogEntriesAsync
   useUpdateEvents((event) => {
     switch (event.type) {
       case UseUpdatesEventType.ERROR:

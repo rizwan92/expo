@@ -37,7 +37,7 @@ Structure representing an available or downloaded update.
 
 #### Defined in
 
-[UseUpdates.types.ts:68](https://github.com/expo/expo/blob/fa06932cc3/packages/@expo/use-updates/src/UseUpdates.types.ts#L68)
+[UseUpdates.types.ts:68](https://github.com/expo/expo/blob/ee9459e82f/packages/@expo/use-updates/src/UseUpdates.types.ts#L68)
 
 ___
 
@@ -62,7 +62,7 @@ Structure encapsulating information on the currently running app
 
 #### Defined in
 
-[UseUpdates.types.ts:15](https://github.com/expo/expo/blob/fa06932cc3/packages/@expo/use-updates/src/UseUpdates.types.ts#L15)
+[UseUpdates.types.ts:15](https://github.com/expo/expo/blob/ee9459e82f/packages/@expo/use-updates/src/UseUpdates.types.ts#L15)
 
 ___
 
@@ -89,7 +89,7 @@ The structures and methods returned by `useUpdates()`.
 
 #### Defined in
 
-[UseUpdates.types.ts:93](https://github.com/expo/expo/blob/fa06932cc3/packages/@expo/use-updates/src/UseUpdates.types.ts#L93)
+[UseUpdates.types.ts:93](https://github.com/expo/expo/blob/ee9459e82f/packages/@expo/use-updates/src/UseUpdates.types.ts#L93)
 
 ## Functions
 
@@ -107,7 +107,7 @@ If an error occurs, the `error` property will be set.
 
 #### Defined in
 
-[UseUpdates.ts:21](https://github.com/expo/expo/blob/fa06932cc3/packages/@expo/use-updates/src/UseUpdates.ts#L21)
+[UseUpdates.ts:22](https://github.com/expo/expo/blob/ee9459e82f/packages/@expo/use-updates/src/UseUpdates.ts#L22)
 
 ___
 
@@ -126,7 +126,7 @@ If an error occurs, the `error` property will be set.
 
 #### Defined in
 
-[UseUpdates.ts:30](https://github.com/expo/expo/blob/fa06932cc3/packages/@expo/use-updates/src/UseUpdates.ts#L30)
+[UseUpdates.ts:31](https://github.com/expo/expo/blob/ee9459e82f/packages/@expo/use-updates/src/UseUpdates.ts#L31)
 
 ___
 
@@ -149,7 +149,7 @@ If an error occurs, the `error` property will be set.
 
 #### Defined in
 
-[UseUpdates.ts:52](https://github.com/expo/expo/blob/fa06932cc3/packages/@expo/use-updates/src/UseUpdates.ts#L52)
+[UseUpdates.ts:53](https://github.com/expo/expo/blob/ee9459e82f/packages/@expo/use-updates/src/UseUpdates.ts#L53)
 
 ___
 
@@ -170,7 +170,7 @@ If an error occurs, the `error` property will be set.
 
 #### Defined in
 
-[UseUpdates.ts:42](https://github.com/expo/expo/blob/fa06932cc3/packages/@expo/use-updates/src/UseUpdates.ts#L42)
+[UseUpdates.ts:43](https://github.com/expo/expo/blob/ee9459e82f/packages/@expo/use-updates/src/UseUpdates.ts#L43)
 
 ___
 
@@ -235,4 +235,4 @@ the structures with information on currently running and available updates.
 
 #### Defined in
 
-[UseUpdates.ts:119](https://github.com/expo/expo/blob/fa06932cc3/packages/@expo/use-updates/src/UseUpdates.ts#L119)
+[UseUpdates.ts:120](https://github.com/expo/expo/blob/ee9459e82f/packages/@expo/use-updates/src/UseUpdates.ts#L120)

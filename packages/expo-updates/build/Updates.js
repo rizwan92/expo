@@ -272,4 +272,14 @@ export function addListener(listener) {
     const emitter = _getEmitter();
     return emitter.addListener('Expo.updatesEvent', listener);
 }
+/**
+ * @hidden
+ */
+export function nativeStateMachineContext() {
+    // Return the current state machine context
+    if (!ExpoUpdates.nativeStateMachineContext) {
+        throw new UnavailabilityError('Updates', 'readLogEntriesAsync');
+    }
+    return ExpoUpdates.nativeStateMachineContext();
+}
 //# sourceMappingURL=Updates.js.map

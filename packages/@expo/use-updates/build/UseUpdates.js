@@ -2,7 +2,7 @@ import * as Updates from 'expo-updates';
 import { useEffect, useState } from 'react';
 import { UseUpdatesEventType } from './UseUpdates.types';
 import { emitUseUpdatesEvent, useUpdateEvents, addUpdatesStateChangeListener, } from './UseUpdatesEmitter';
-import { currentlyRunning, availableUpdateFromContext, downloadedUpdateFromContext, } from './UseUpdatesUtils';
+import { currentlyRunning, defaultUseUpdatesState, reduceUpdatesStateFromContext, readNativeContext, } from './UseUpdatesUtils';
 /**
  * Calls [`Updates.checkForUpdateAsync()`](https://docs.expo.dev/versions/latest/sdk/updates/#updatescheckforupdateasync)
  * and refreshes the `availableUpdate` property with the result.
@@ -104,41 +104,15 @@ export const readLogEntries = (maxAge = 3600000) => {
  * ```
  */
 export const useUpdates = () => {
-    const [updatesState, setUpdatesState] = useState({
-        isUpdateAvailable: false,
-        isUpdatePending: false,
-        isChecking: false,
-        isDownloading: false,
-    });
+    const [updatesState, setUpdatesState] = useState(defaultUseUpdatesState);
     useEffect(() => {
+        setUpdatesState((updatesState) => reduceUpdatesStateFromContext(updatesState, readNativeContext()));
         const subscription = addUpdatesStateChangeListener((event) => {
-            setUpdatesState((updatesState) => {
-                if (event.context.isChecking) {
-                    return {
-                        ...updatesState,
-                        isChecking: true,
-                        lastCheckForUpdateTimeSinceRestart: new Date(),
-                    };
-                }
-                const availableUpdate = availableUpdateFromContext(event.context);
-                const downloadedUpdate = downloadedUpdateFromContext(event.context);
-                return {
-                    ...updatesState,
-                    isUpdateAvailable: event.context.isUpdateAvailable,
-                    isUpdatePending: event.context.isUpdatePending || availableUpdate?.isRollback || false,
-                    isChecking: event.context.isChecking,
-                    isDownloading: event.context.isDownloading,
-                    availableUpdate,
-                    downloadedUpdate,
-                    error: event.context.checkError || event.context.downloadError,
-                };
-            });
+            setUpdatesState((updatesState) => reduceUpdatesStateFromContext(updatesState, event.context));
+            return () => subscription.remove();
         });
-        return () => subscription.remove();
     }, []);
-    // Set up listener for events from automatic update requests
-    // that happen on startup, and use events to refresh the updates info
-    // context
+    // Set up listener for events from readLogEntriesAsync
     useUpdateEvents((event) => {
         switch (event.type) {
             case UseUpdatesEventType.ERROR:

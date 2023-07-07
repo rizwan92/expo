@@ -337,3 +337,14 @@ export function addListener(listener: (event: UpdateEvent) => void): EventSubscr
   const emitter = _getEmitter();
   return emitter.addListener('Expo.updatesEvent', listener);
 }
+
+/**
+ * @hidden
+ */
+export function nativeStateMachineContext(): { [key: string]: any } {
+  // Return the current state machine context
+  if (!ExpoUpdates.nativeStateMachineContext) {
+    throw new UnavailabilityError('Updates', 'readLogEntriesAsync');
+  }
+  return ExpoUpdates.nativeStateMachineContext();
+}

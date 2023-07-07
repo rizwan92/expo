@@ -1,6 +1,10 @@
 import * as Updates from 'expo-updates';
 
-import type { CurrentlyRunningInfo } from './UseUpdates.types';
+import type {
+  CurrentlyRunningInfo,
+  UpdatesNativeStateMachineContext,
+  UseUpdatesStateType,
+} from './UseUpdates.types';
 
 // The currently running info, constructed from Updates constants
 export const currentlyRunning: CurrentlyRunningInfo = {
@@ -51,4 +55,61 @@ export const downloadedUpdateFromContext = (context: { [key: string]: any }) => 
         isRollback,
       }
     : undefined;
+};
+
+// Read the native context directly from expo-updates native module
+// Fall back to default if native method throws or is not available
+export const readNativeContext: () => UpdatesNativeStateMachineContext = () => {
+  const defaultContext: UpdatesNativeStateMachineContext = {
+    isChecking: false,
+    isDownloading: false,
+    isRestarting: false,
+    isRollback: false,
+    isUpdateAvailable: false,
+    isUpdatePending: false,
+  };
+  if (Updates.nativeStateMachineContext) {
+    try {
+      const nativeContext = Updates.nativeStateMachineContext();
+      return {
+        ...defaultContext,
+        ...nativeContext,
+      };
+    } catch {}
+  }
+  return defaultContext;
+};
+
+// Default useUpdates() state
+export const defaultUseUpdatesState: UseUpdatesStateType = {
+  isChecking: false,
+  isDownloading: false,
+  isUpdateAvailable: false,
+  isUpdatePending: false,
+};
+
+// Transform the useUpdates() state based on native state machine context
+export const reduceUpdatesStateFromContext = (
+  updatesState: UseUpdatesStateType,
+  context: UpdatesNativeStateMachineContext
+) => {
+  if (context.isChecking) {
+    return {
+      ...updatesState,
+      isChecking: true,
+      lastCheckForUpdateTimeSinceRestart: new Date(),
+    };
+  }
+  const availableUpdate = availableUpdateFromContext(context);
+  const downloadedUpdate = downloadedUpdateFromContext(context);
+  return {
+    ...updatesState,
+    isUpdateAvailable: context.isUpdateAvailable,
+    isUpdatePending: context.isUpdatePending || availableUpdate?.isRollback || false,
+    isChecking: context.isChecking,
+    isDownloading: context.isDownloading,
+    availableUpdate,
+    downloadedUpdate,
+    error: context.checkError || context.downloadError,
+  };
 };
