@@ -1,17 +1,37 @@
 /**
  * Test app that shows some features of the Updates API
  */
-import {
-  checkForUpdate,
-  downloadUpdate,
-  useUpdates,
-} from '@expo/use-updates';
+import { checkForUpdate, downloadUpdate, useUpdates } from '@expo/use-updates';
 import { StatusBar } from 'expo-status-bar';
 import * as Updates from 'expo-updates';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 export default function App() {
+  const [showingView1, setShowingView1] = useState(true);
+  const [showingView2, setShowingView2] = useState(false);
+  return (
+    <View style={styles.container}>
+      <Text style={styles.titleText}>Updates JS API test</Text>
+      <Pressable
+        style={styles.button}
+        onPress={() => setShowingView1((showingView1) => !showingView1)}
+      >
+        <Text style={styles.buttonText}>Toggle view 1</Text>
+      </Pressable>
+      <Pressable
+        style={styles.button}
+        onPress={() => setShowingView2((showingView2) => !showingView2)}
+      >
+        <Text style={styles.buttonText}>Toggle view 2</Text>
+      </Pressable>
+      {showingView1 ? <UpdatesStatusView index={1} /> : null}
+      {showingView2 ? <UpdatesStatusView index={2} /> : null}
+    </View>
+  );
+}
+
+function UpdatesStatusView(props: { index: number }) {
   const [updateMessage, setUpdateMessage] = React.useState('');
 
   // Displays a message showing whether or not the app is running
@@ -80,8 +100,7 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.titleText}>Updates JS API test</Text>
-      <Text> </Text>
+      <Text>View {props.index}</Text>
       <Text>{runTypeMessage}</Text>
       <Text>{checkAutomaticallyMessage}</Text>
       <Text> </Text>
@@ -105,7 +124,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
   },
   button: {
     alignItems: 'center',
@@ -122,10 +141,10 @@ const styles = StyleSheet.create({
   },
   updateMessageText: {
     margin: 10,
-    height: 200,
+    height: 100,
     paddingVertical: 12,
     paddingHorizontal: 32,
-    width: '90%',
+    width: 250,
     borderColor: '#4630EB',
     borderWidth: 1,
     borderRadius: 4,
