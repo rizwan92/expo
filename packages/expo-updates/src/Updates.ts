@@ -346,5 +346,14 @@ export async function nativeStateMachineContext(): Promise<{ [key: string]: any 
   if (!ExpoUpdates.nativeStateMachineContext) {
     throw new UnavailabilityError('Updates', 'readLogEntriesAsync');
   }
-  return await ExpoUpdates.nativeStateMachineContext();
+  const nativeContext = await ExpoUpdates.nativeStateMachineContext();
+  if (nativeContext.latestManifestString) {
+    nativeContext.latestManifest = JSON.parse(nativeContext.latestManifestString);
+    delete nativeContext.latestManifestString;
+  }
+  if (nativeContext.downloadedManifestString) {
+    nativeContext.downloadedManifest = JSON.parse(nativeContext.downloadedManifestString);
+    delete nativeContext.downloadedManifestString;
+  }
+  return nativeContext;
 }

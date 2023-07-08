@@ -280,6 +280,15 @@ export async function nativeStateMachineContext() {
     if (!ExpoUpdates.nativeStateMachineContext) {
         throw new UnavailabilityError('Updates', 'readLogEntriesAsync');
     }
-    return await ExpoUpdates.nativeStateMachineContext();
+    const nativeContext = await ExpoUpdates.nativeStateMachineContext();
+    if (nativeContext.latestManifestString) {
+        nativeContext.latestManifest = JSON.parse(nativeContext.latestManifestString);
+        delete nativeContext.latestManifestString;
+    }
+    if (nativeContext.downloadedManifestString) {
+        nativeContext.downloadedManifest = JSON.parse(nativeContext.downloadedManifestString);
+        delete nativeContext.downloadedManifestString;
+    }
+    return nativeContext;
 }
 //# sourceMappingURL=Updates.js.map
