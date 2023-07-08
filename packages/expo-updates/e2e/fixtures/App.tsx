@@ -1,10 +1,5 @@
 import { Inter_900Black } from '@expo-google-fonts/inter';
-import {
-  useUpdates,
-  checkForUpdate,
-  downloadUpdate,
-  runUpdate,
-} from '@expo/use-updates';
+import { useUpdates, checkForUpdate, downloadUpdate, runUpdate } from '@expo/use-updates';
 import Constants from 'expo-constants';
 import { NativeModulesProxy } from 'expo-modules-core';
 import { StatusBar } from 'expo-status-bar';
@@ -48,7 +43,13 @@ export default function App() {
   const [lastUpdateEventType, setLastUpdateEventType] = React.useState('');
   const [extraParamsString, setExtraParamsString] = React.useState('');
 
-  const { currentlyRunning, availableUpdate, isUpdateAvailable, isUpdatePending } = useUpdates();
+  const {
+    currentlyRunning,
+    availableUpdate,
+    downloadedUpdate,
+    isUpdateAvailable,
+    isUpdatePending,
+  } = useUpdates();
 
   Updates.useUpdateEvents((event) => {
     setLastUpdateEventType(event.type);
@@ -156,6 +157,18 @@ export default function App() {
       <TestValue testID="availableUpdateID" value={`${availableUpdate?.updateId}`} />
       <TestValue testID="extraParamsString" value={`${extraParamsString}`} />
 
+      <TestValue testID="state.isUpdateAvailable" value={`${isUpdateAvailable}`} />
+      <TestValue testID="state.isUpdatePending" value={`${isUpdatePending}`} />
+      <TestValue testID="state.isRollback" value={`${availableUpdate?.isRollback ?? false}`} />
+      <TestValue
+        testID="state.latestManifest.id"
+        value={`${availableUpdate?.manifest?.id || ''}`}
+      />
+      <TestValue
+        testID="state.downloadedManifest.id"
+        value={`${downloadedUpdate?.manifest?.id || ''}`}
+      />
+
       <Text>Log messages</Text>
       <ScrollView style={styles.logEntriesContainer}>
         <Text testID="logEntries" style={styles.logEntriesText}>
@@ -163,10 +176,10 @@ export default function App() {
         </Text>
       </ScrollView>
 
-      <Text>Updates expoConfig</Text>
+      <Text>Updates expoClient</Text>
       <ScrollView style={styles.logEntriesContainer}>
         <Text testID="updates.expoConfig" style={styles.logEntriesText}>
-          {JSON.stringify(Updates.manifest.extra?.expoConfig || {})}
+          {`${JSON.stringify(Updates.manifest?.extra?.expoClient ?? {})}`}
         </Text>
       </ScrollView>
 
